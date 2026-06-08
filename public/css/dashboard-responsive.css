@@ -1,0 +1,37 @@
+/* ======================
+   Адаптивность
+   ====================== */
+@media (max-width: 1024px) {
+    .dashboardHero {
+        grid-template-columns: 1fr;
+    }
+    .dashboardHero__side {
+        grid-template-rows: repeat(3, auto);
+    }
+    .cards-row .dashboardLessonCard {
+        flex: 1 1 calc(50% - 16px);
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboardHero__main {
+        gap: 12px;
+    }
+    .dashboardHero__title {
+        font-size: 28px;
+    }
+    .dashboardStats {
+        flex-direction: column;
+    }
+    .cards-row .dashboardLessonCard {
+        flex: 1 1 100%;
+    }
+    .dashboardMiniCard--hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .lessonChestMiniCard__body {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
