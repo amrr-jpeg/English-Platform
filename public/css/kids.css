@@ -5663,3 +5663,200 @@ textarea::placeholder {
         grid-template-rows: auto !important;
     }
 }
+
+/* ======================
+   Общие стили
+   ====================== */
+.dashboardPage {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* ======================
+   Hero Section
+   ====================== */
+.dashboardHero {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.dashboardHero__main {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.dashboardHero__title {
+    font-size: clamp(36px, 4vw, 72px);
+    margin: 0;
+}
+
+.dashboardHero__text {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.dashboardStats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.dashboardStat {
+    background: #fff7d6;
+    padding: 14px 18px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 120px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ======================
+   Правая колонка
+   ====================== */
+.dashboardHero__side {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.dashboardMiniCard, .lessonChestMiniCard {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 150px;
+}
+
+.dashboardMiniCard--hero {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+}
+
+.lessonChestMiniCard__icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    background: linear-gradient(135deg, #ffe08a, #ffb703);
+    box-shadow: 0 6px 12px rgba(255,183,3,0.25);
+    margin-right: 12px;
+}
+
+.lessonChestMiniCard__progress {
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.lessonChestMiniCard__bar {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #84cc16, #facc15);
+    transition: width 0.5s ease;
+}
+
+/* ======================
+   Уроки
+   ====================== */
+.cards-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.dashboardLessonCard {
+    background: #fff;
+    padding: 14px;
+    border-radius: 12px;
+    flex: 1 1 calc(25% - 16px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dashboardLessonCard--locked {
+    opacity: 0.6;
+}
+
+/* Прогресс внутри карточки */
+.progress__bar {
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #22c55e, #84cc16, #facc15);
+}
+
+/* Кнопки */
+.dashboardLessonCard__button, .lessonChestMiniCard__button {
+    background: linear-gradient(135deg, #f97316, #facc15);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    margin-top: 8px;
+}
+
+.dashboardLessonCard__button:hover, .lessonChestMiniCard__button:hover {
+    transform: scale(1.03);
+}
+
+.dashboardLessonCard__button.btn--disabled, .lessonChestMiniCard__button.lessonChestMiniCard__button--disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ======================
+   Адаптивность
+   ====================== */
+@media (max-width: 1024px) {
+    .dashboardHero {
+        grid-template-columns: 1fr;
+    }
+    .dashboardHero__side {
+        grid-template-rows: repeat(3, auto);
+    }
+    .cards-row .dashboardLessonCard {
+        flex: 1 1 calc(50% - 16px);
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboardHero__main {
+        gap: 12px;
+    }
+    .dashboardHero__title {
+        font-size: 28px;
+    }
+    .dashboardStats {
+        flex-direction: column;
+    }
+    .cards-row .dashboardLessonCard {
+        flex: 1 1 100%;
+    }
+    .dashboardMiniCard--hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .lessonChestMiniCard__body {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
