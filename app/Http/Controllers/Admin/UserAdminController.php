@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\ExerciseAttempt;
+use App\Models\User;
+use App\Models\UserLesson;
+use Illuminate\Http\Request;
+
+class UserAdminController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = trim((string) $request->input('q'));
+
+        $users = User::query()
+            ->when($query !== '', function ($q) use ($query) {
+                $q->where(function ($inner) use ($query) {
+                    $inner->where('name', 'like', '%' . $query . '%')
+                        ->orWhere('email', 'like', '%' . $query . '%');
+                });
+            })
+            ->withCount([
+                'userLessons as completed_lessons_count' => fn ($q) => $q->where('is_completed', true),
+                'exerciseAttempts as attempts_count',
+                'exerciseAttempts as correct_attempts_count' => fn ($q) => $q->where('is_correct', true),
+            ])
+            ->orderByDesc('xp')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.users.index', compact('users', 'query'));
+    }
+
+    public function toggleBlock(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Нельзя заблокировать самого себя.');
+        }
+
+        $user->is_blocked = !$user->is_blocked;
+        $user->blocked_until = $user->is_blocked ? now()->addYears(10) : null;
+        $user->save();
+
+        return back()->with('success', $user->is_blocked ? 'Пользователь заблокирован.' : 'Пользователь разблокирован.');
+    }
+
+    public function toggleAdmin(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Нельзя изменить роль самому себе.');
+        }
+
+        $user->is_admin = !$user->is_admin;
+        $user->save();
+
+        return back()->with('success', $user->is_admin ? 'Пользователь получил права администратора.' : 'Права администратора сняты.');
+    }
+}
