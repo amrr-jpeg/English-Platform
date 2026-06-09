@@ -5823,40 +5823,131 @@ textarea::placeholder {
     transform: none;
 }
 
-/* ======================
-   Адаптивность
-   ====================== */
-@media (max-width: 1024px) {
+/* ===== FINAL MOBILE FIX ===== */
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+    .modernTopbar,
+    .topbar,
+    .navbar {
+        position: relative !important;
+        height: auto !important;
+        padding: 10px !important;
+        overflow: visible !important;
+    }
+
+    .modernTopbar__inner,
+    .topbar__inner,
+    .navWrap,
+    .nav {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .modernTopbar a,
+    .topbar a,
+    .nav a,
+    .dropdown,
+    .dropdown-toggle {
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: center !important;
+        white-space: normal !important;
+    }
+
+    .dashboardPage {
+        padding: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
     .dashboardHero {
-        grid-template-columns: 1fr;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
     }
+
+    .dashboardHero__main {
+        min-height: auto !important;
+        padding: 22px !important;
+    }
+
+    .dashboardHero__title {
+        font-size: 38px !important;
+        line-height: 1 !important;
+    }
+
+    .dashboardStats {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
     .dashboardHero__side {
-        grid-template-rows: repeat(3, auto);
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        min-height: auto !important;
     }
-    .cards-row .dashboardLessonCard {
-        flex: 1 1 calc(50% - 16px);
+
+    .dashboardMiniCard {
+        padding: 18px !important;
+        min-height: auto !important;
+    }
+
+    .dashboardLessonGrid,
+    .cards-row {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .dashboardLessonCard {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: auto !important;
     }
 }
 
-@media (max-width: 600px) {
-    .dashboardHero__main {
-        gap: 12px;
-    }
-    .dashboardHero__title {
-        font-size: 28px;
-    }
-    .dashboardStats {
-        flex-direction: column;
-    }
-    .cards-row .dashboardLessonCard {
-        flex: 1 1 100%;
-    }
-    .dashboardMiniCard--hero {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .lessonChestMiniCard__body {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+/* progress fix */
+.progress,
+.dashboardLessonCard__progress {
+    display: block !important;
+    width: 100% !important;
+    height: 12px !important;
+    background: #e5e7eb !important;
+    border-radius: 999px !important;
+    overflow: hidden !important;
+    margin: 14px 0 !important;
+}
+
+.progress__bar {
+    display: block !important;
+    height: 100% !important;
+    min-width: 4px;
+    background: linear-gradient(90deg, #22c55e, #84cc16, #facc15) !important;
+    border-radius: 999px !important;
+    transition: width .5s ease !important;
+}
+
+.dashboardMoreWrap {
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 28px !important;
+}
+
+#showMoreLessonsBtn {
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 14px 24px !important;
+    border-radius: 18px !important;
+    font-weight: 900 !important;
 }
