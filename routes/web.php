@@ -105,6 +105,12 @@ Route::middleware(['content_manager'])->prefix('manager')->name('manager.')->gro
 
     Route::post('/lessons/{lesson}/exercises', [ManagerCourseController::class, 'storeExercise'])->name('lessons.exercises.store');
     Route::delete('/exercises/{exercise}', [ManagerCourseController::class, 'deleteExercise'])->name('exercises.destroy');
+
+    Route::get('/courses', [PublicContentController::class, 'courses'])
+    ->name('content.courses.index');
+
+    Route::get('/courses/{course}', [PublicContentController::class, 'course'])
+    ->name('content.courses.show');
 });
 });
 

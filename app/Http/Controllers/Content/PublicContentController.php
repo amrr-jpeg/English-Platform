@@ -31,6 +31,16 @@ class PublicContentController extends Controller
         return view('content.managers.index', compact('managers', 'subscriptions'));
     }
 
+    public function courses()
+{
+    $courses = \App\Models\ContentCourse::with('manager')
+        ->where('is_published', true)
+        ->latest()
+        ->get();
+
+    return view('content.courses.index', compact('courses'));
+}
+
     public function manager(User $manager)
     {
         abort_unless($manager->role === User::ROLE_CONTENT_MANAGER || $manager->isAdmin(), 404);
