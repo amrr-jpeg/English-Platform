@@ -1,97 +1,92 @@
-/* --- Общие стили --- */
-.dashboardPage {
-    padding: 1rem;
-    max-width: 1200px;
-    margin: auto;
-}
-
-.dashboardHero {
+/* Верхнее меню адаптив */
+.dashboardPage header, 
+.dashboardPage .top-bar, 
+.dashboardPage .navbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
 }
 
-.dashboardHero__main {
-    flex: 2 1 600px;
+.dashboardPage header .logo {
+    flex: 1 1 auto;
+    max-width: 200px;
 }
 
-.dashboardHero__side {
-    flex: 1 1 300px;
+.dashboardPage header .user-stats {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-/* --- Карточки уроков --- */
-.cards-row {
-    display: flex;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    gap: 0.5rem;
     flex-wrap: wrap;
-    gap: 1rem;
 }
 
-.dashboardLessonCard {
-    flex: 1 1 calc(25% - 1rem);
-    min-width: 220px;
+.dashboardPage header .user-stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.5rem;
     background: #fff;
-    padding: 1rem;
-    border-radius: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.dashboardPage header .user-dropdown {
+    margin-left: 1rem;
     position: relative;
 }
 
-.dashboardLessonCard__progress .progress__bar {
-    height: 6px;
-    border-radius: 4px;
-    background: linear-gradient(to right, #4facfe, #00f2fe);
+/* Меню "гамбургер" */
+.dashboardPage header .menu-toggle {
+    display: none;
+    background: #0a85ff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    color: #fff;
+    font-size: 1.2rem;
 }
 
-/* --- Кнопка Показать ещё уроки --- */
-.showMoreWrapper {
-    text-align: center;
-    margin: 1.5rem 0;
-}
-
-/* --- Адаптив --- */
-@media (max-width: 1024px) {
-    .dashboardHero {
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .dashboardPage header {
         flex-direction: column;
+        align-items: stretch;
     }
-    .dashboardHero__side {
-        flex-direction: row;
-        flex-wrap: wrap;
+
+    .dashboardPage header .user-stats {
+        justify-content: space-between;
+        margin-top: 0.5rem;
     }
+
+    .dashboardPage header .menu-toggle {
+        display: block;
+        margin-left: auto;
+    }
+
+    .dashboardPage header .user-dropdown {
+        margin-left: 0;
+        margin-top: 0.3rem;
+    }
+}
+
+/* Прогресс-бар уроков адаптив */
+.dashboardLessonCard .progress__bar {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #0a85ff, #2bc9ff);
+    transition: width 0.3s ease;
 }
 
 @media (max-width: 768px) {
     .dashboardLessonCard {
-        flex: 1 1 calc(50% - 1rem);
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboardLessonCard {
-        flex: 1 1 100%;
+        width: 100%;
+        margin-bottom: 1rem;
     }
 
-    .dashboardHero__main, .dashboardHero__side {
-        flex: 1 1 100%;
-    }
-
-    .dashboardStats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .dashboardStat {
-        flex: 1 1 45%;
-    }
-
-    .dashboardHero__label {
-        font-size: 0.9rem;
-    }
-
-    .dashboardHero__title {
-        font-size: 1.6rem;
+    .dashboardLessonCard .dashboardLessonCard__bottom {
+        flex-direction: column;
+        gap: 0.3rem;
     }
 }
