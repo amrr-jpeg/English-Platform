@@ -1,50 +1,97 @@
-/* Адаптив для мобильных и планшетов */
+/* --- Общие стили --- */
+.dashboardPage {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.dashboardHero {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.dashboardHero__main {
+    flex: 2 1 600px;
+}
+
+.dashboardHero__side {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* --- Карточки уроков --- */
+.cards-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.dashboardLessonCard {
+    flex: 1 1 calc(25% - 1rem);
+    min-width: 220px;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    position: relative;
+}
+
+.dashboardLessonCard__progress .progress__bar {
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+}
+
+/* --- Кнопка Показать ещё уроки --- */
+.showMoreWrapper {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+/* --- Адаптив --- */
 @media (max-width: 1024px) {
     .dashboardHero {
         flex-direction: column;
     }
-
-    .dashboardHero__main, .dashboardHero__side {
-        width: 100%;
-    }
-
-    .dashboardStats {
+    .dashboardHero__side {
+        flex-direction: row;
         flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .dashboardLessonCard {
-        width: 100% !important;
-        margin-bottom: 1rem;
-    }
-
-    .cards-row {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    #showMoreLessonsBtn {
-        width: 100%;
-        text-align: center;
-        margin-top: 1rem;
     }
 }
 
 @media (max-width: 768px) {
-    .dashboardHero__label, .dashboardHero__title, .dashboardHero__text {
-        text-align: center;
+    .dashboardLessonCard {
+        flex: 1 1 calc(50% - 1rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboardLessonCard {
+        flex: 1 1 100%;
     }
 
-    .dashboardMiniCard {
-        margin-bottom: 1rem;
+    .dashboardHero__main, .dashboardHero__side {
+        flex: 1 1 100%;
     }
 
     .dashboardStats {
-        justify-content: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
-    .lessonChestMiniCard__bar {
-        transition: width 0.5s ease-in-out;
+    .dashboardStat {
+        flex: 1 1 45%;
+    }
+
+    .dashboardHero__label {
+        font-size: 0.9rem;
+    }
+
+    .dashboardHero__title {
+        font-size: 1.6rem;
     }
 }

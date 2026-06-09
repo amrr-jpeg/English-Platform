@@ -2,13 +2,14 @@
 
 @section('content')
 <div class="dashboardPage">
+
+    <!-- Хедер -->
     <section class="dashboardHero">
-        <!-- Левая колонка -->
         <div class="dashboardHero__main card">
             <div class="dashboardHero__label">🎮 English Platform</div>
             <h1 class="dashboardHero__title">Учись английскому играя</h1>
             <p class="dashboardHero__text">
-                Проходи уроки по порядку, получай XP и монеты, открывай новые задания и прокачивай своего героя.
+                Проходи уроки по порядку, получай XP и монеты, открывай новые задания и прокачивай героя.
             </p>
 
             <div class="dashboardStats" aria-label="Статистика пользователя">
@@ -16,17 +17,14 @@
                     <span class="dashboardStat__label">Уровень</span>
                     <strong class="dashboardStat__value">{{ $user->level }}</strong>
                 </div>
-
                 <div class="dashboardStat">
                     <span class="dashboardStat__label">Опыт</span>
                     <strong class="dashboardStat__value">{{ $user->xp }}</strong>
                 </div>
-
                 <div class="dashboardStat">
                     <span class="dashboardStat__label">Монеты</span>
                     <strong class="dashboardStat__value">{{ $user->coins }}</strong>
                 </div>
-
                 <div class="dashboardStat">
                     <span class="dashboardStat__label">Серия дней</span>
                     <strong class="dashboardStat__value">{{ $user->streak ?? 0 }}</strong>
@@ -36,9 +34,8 @@
         </div>
 
         <!-- Правая колонка -->
-        <aside class="dashboardHero__side" aria-label="Быстрые блоки">
-            <!-- Миссия дня -->
-            <div class="dashboardMiniCard card dashboardMiniCard--mission">
+        <aside class="dashboardHero__side card">
+            <div class="dashboardMiniCard dashboardMiniCard--mission">
                 <div class="dashboardMiniCard__top">
                     <span class="badge">🎯 Миссия дня</span>
                     <span class="pill">🔥 Серия: {{ $user->streak ?? 0 }}</span>
@@ -49,8 +46,7 @@
                 </p>
             </div>
 
-            <!-- Герой -->
-            <div class="dashboardMiniCard card dashboardMiniCard--hero">
+            <div class="dashboardMiniCard dashboardMiniCard--hero">
                 @include('partials.player-avatar', [
                     'user' => $user,
                     'avatarClass' => 'dashboardAvatar dashboardAvatar--custom',
@@ -58,23 +54,18 @@
                 <div>
                     <h2 class="dashboardMiniCard__title">Твой герой</h2>
                     <p class="dashboardMiniCard__text">
-                        Чем больше уроков ты проходишь, тем быстрее растёт персонаж.
+                        Чем больше уроков проходишь, тем быстрее растёт персонаж.
                     </p>
                 </div>
             </div>
 
-            <!-- Сундук -->
-            <div class="dashboardMiniCard card lessonChestMiniCard">
+            <div class="dashboardMiniCard lessonChestMiniCard">
                 <div class="lessonChestMiniCard__top">
                     <span class="badge">🎁 Наградной путь</span>
                     <span class="pill">{{ $lessonChestProgress }}/5</span>
                 </div>
-
                 <div class="lessonChestMiniCard__body">
-                    <div class="lessonChestMiniCard__icon {{ $lessonChestAvailable ? 'lessonChestMiniCard__icon--ready' : '' }}">
-                        🎁
-                    </div>
-
+                    <div class="lessonChestMiniCard__icon {{ $lessonChestAvailable ? 'lessonChestMiniCard__icon--ready' : '' }}">🎁</div>
                     <div>
                         <h2 class="dashboardMiniCard__title">Сундук за уроки</h2>
                         <p class="dashboardMiniCard__text">
@@ -83,7 +74,6 @@
                         </p>
                     </div>
                 </div>
-
                 <div class="lessonChestMiniCard__progress">
                     <div class="lessonChestMiniCard__bar" style="width: {{ $lessonChestPercent }}%"></div>
                 </div>
@@ -96,9 +86,7 @@
                         </button>
                     </form>
                 @else
-                    <button class="lessonChestMiniCard__button lessonChestMiniCard__button--disabled" disabled>
-                        Сундук закрыт 🔒
-                    </button>
+                    <button class="lessonChestMiniCard__button lessonChestMiniCard__button--disabled" disabled>Сундук закрыт 🔒</button>
                 @endif
             </div>
         </aside>
@@ -143,8 +131,11 @@
                 </div>
             @endforeach
         </div>
+
         @if(count($lessons) > 8)
-            <button id="showMoreLessonsBtn" class="btn btn--show-more">Показать ещё уроки</button>
+        <div class="showMoreWrapper">
+            <button id="showMoreLessonsBtn" class="btn btn--primary">Показать ещё уроки</button>
+        </div>
         @endif
     </section>
 </div>
@@ -157,15 +148,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (showMoreButton) {
         lessonCards.forEach((card, index) => {
-            if (index >= visibleCount) card.style.display = 'none';
+            if(index >= visibleCount) card.style.display = 'none';
         });
 
         showMoreButton.addEventListener('click', () => {
+            let newVisible = visibleCount + 8;
             lessonCards.forEach((card, index) => {
-                if (index < visibleCount + 8) card.style.display = '';
+                if(index < newVisible) card.style.display = '';
             });
-            visibleCount += 8;
-            if (visibleCount >= lessonCards.length) showMoreButton.style.display = 'none';
+            visibleCount = newVisible;
+            if(visibleCount >= lessonCards.length) showMoreButton.style.display = 'none';
         });
     }
 });
