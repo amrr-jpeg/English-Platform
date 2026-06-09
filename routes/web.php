@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\LessonAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\ChestController;
+use App\Http\Controllers\Content\ManagerCourseController;
+use App\Http\Controllers\Content\PublicContentController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\GameController;
@@ -18,10 +20,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\TravelController;
 use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\Content\ManagerCourseController;
-use App\Http\Controllers\Content\PublicContentController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,8 +34,17 @@ Route::post('/verify-code', [VerificationController::class, 'verify'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [LessonController::class, 'index'])->name('dashboard');
-    Route::get('/lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
-    Route::post('/exercises/{exercise}/submit', [ExerciseController::class, 'submit'])->name('exercises.submit');
+
+    Route::get('/lessons/{lesson}', [LessonController::class, 'show'])
+        ->whereNumber('lesson')
+        ->name('lessons.show');
+
+    Route::post('/exercises/{exercise}/submit', [ExerciseController::class, 'submit'])
+        ->whereNumber('exercise')
+        ->name('exercises.submit');
+
+    Route::post('/lesson-chest/claim', [LessonController::class, 'claimLessonChest'])
+        ->name('lesson-chest.claim');
 
     Route::get('/character', [CharacterController::class, 'index'])->name('character');
     Route::post('/character/buy-skin', [CharacterController::class, 'buySkin'])->name('character.buySkin');
@@ -44,9 +52,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/shop', [ShopController::class, 'index'])->name('shop');
     Route::post('/shop/buy', [ShopController::class, 'buy'])->name('shop.buy');
     Route::post('/shop/equip', [ShopController::class, 'equip'])->name('shop.equip');
-
-    Route::post('/lesson-chest/claim', [LessonController::class, 'claimLessonChest'])
-    ->name('lesson-chest.claim');
 
     Route::get('/achievements', [AchievementController::class, 'index'])->name('achievements');
 
@@ -79,42 +84,95 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mistakes', [MistakeController::class, 'index'])->name('mistakes.index');
     Route::get('/my-profile', [ProfilePageController::class, 'index'])->name('profile.page');
 
-
-    // Контент-менеджеры и пользовательские курсы
-Route::get('/content-managers', [PublicContentController::class, 'managers'])->name('content.managers.index');
-Route::get('/content-managers/{manager}', [PublicContentController::class, 'manager'])->name('content.managers.show');
-Route::post('/content-managers/{manager}/subscribe', [PublicContentController::class, 'subscribe'])->name('content.managers.subscribe');
-Route::delete('/content-managers/{manager}/unsubscribe', [PublicContentController::class, 'unsubscribe'])->name('content.managers.unsubscribe');
-
-Route::get('/my-subscriptions/courses', [PublicContentController::class, 'subscriptions'])->name('content.subscriptions');
-Route::get('/community/courses/{course}', [PublicContentController::class, 'course'])->name('content.courses.show');
-Route::get('/community/lessons/{lesson}', [PublicContentController::class, 'lesson'])->name('content.lessons.show');
-
-Route::middleware(['content_manager'])->prefix('manager')->name('manager.')->group(function () {
-    Route::get('/courses', [ManagerCourseController::class, 'index'])->name('courses.index');
-    Route::get('/courses/create', [ManagerCourseController::class, 'create'])->name('courses.create');
-    Route::post('/courses', [ManagerCourseController::class, 'store'])->name('courses.store');
-
-    Route::get('/courses/{course}/edit', [ManagerCourseController::class, 'edit'])->name('courses.edit');
-    Route::put('/courses/{course}', [ManagerCourseController::class, 'update'])->name('courses.update');
-    Route::delete('/courses/{course}', [ManagerCourseController::class, 'destroy'])->name('courses.destroy');
-
-    Route::post('/courses/{course}/lessons', [ManagerCourseController::class, 'storeLesson'])->name('courses.lessons.store');
-    Route::put('/lessons/{lesson}', [ManagerCourseController::class, 'updateLesson'])->name('lessons.update');
-    Route::delete('/lessons/{lesson}', [ManagerCourseController::class, 'deleteLesson'])->name('lessons.destroy');
-
-    Route::post('/lessons/{lesson}/exercises', [ManagerCourseController::class, 'storeExercise'])->name('lessons.exercises.store');
-    Route::delete('/exercises/{exercise}', [ManagerCourseController::class, 'deleteExercise'])->name('exercises.destroy');
+    /*
+    |--------------------------------------------------------------------------
+    | Публичные курсы от контент-менеджеров
+    |--------------------------------------------------------------------------
+    | Эти маршруты видят ВСЕ авторизованные пользователи.
+    */
 
     Route::get('/courses', [PublicContentController::class, 'courses'])
-    ->name('content.courses.index');
+        ->name('content.courses.index');
 
     Route::get('/courses/{course}', [PublicContentController::class, 'course'])
-    ->name('content.courses.show');
-});
-});
+        ->whereNumber('course')
+        ->name('content.courses.show');
 
+    Route::get('/content-managers', [PublicContentController::class, 'managers'])
+        ->name('content.managers.index');
 
+    Route::get('/content-managers/{manager}', [PublicContentController::class, 'manager'])
+        ->whereNumber('manager')
+        ->name('content.managers.show');
+
+    Route::post('/content-managers/{manager}/subscribe', [PublicContentController::class, 'subscribe'])
+        ->whereNumber('manager')
+        ->name('content.managers.subscribe');
+
+    Route::delete('/content-managers/{manager}/unsubscribe', [PublicContentController::class, 'unsubscribe'])
+        ->whereNumber('manager')
+        ->name('content.managers.unsubscribe');
+
+    Route::get('/my-subscriptions/courses', [PublicContentController::class, 'subscriptions'])
+        ->name('content.subscriptions');
+
+    Route::get('/community/lessons/{lesson}', [PublicContentController::class, 'lesson'])
+        ->whereNumber('lesson')
+        ->name('content.lessons.show');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Кабинет контент-менеджера
+    |--------------------------------------------------------------------------
+    | Эти маршруты видят только content_manager и admin.
+    */
+
+    Route::middleware(['content_manager'])
+        ->prefix('manager')
+        ->name('manager.')
+        ->group(function () {
+            Route::get('/courses', [ManagerCourseController::class, 'index'])
+                ->name('courses.index');
+
+            Route::get('/courses/create', [ManagerCourseController::class, 'create'])
+                ->name('courses.create');
+
+            Route::post('/courses', [ManagerCourseController::class, 'store'])
+                ->name('courses.store');
+
+            Route::get('/courses/{course}/edit', [ManagerCourseController::class, 'edit'])
+                ->whereNumber('course')
+                ->name('courses.edit');
+
+            Route::put('/courses/{course}', [ManagerCourseController::class, 'update'])
+                ->whereNumber('course')
+                ->name('courses.update');
+
+            Route::delete('/courses/{course}', [ManagerCourseController::class, 'destroy'])
+                ->whereNumber('course')
+                ->name('courses.destroy');
+
+            Route::post('/courses/{course}/lessons', [ManagerCourseController::class, 'storeLesson'])
+                ->whereNumber('course')
+                ->name('courses.lessons.store');
+
+            Route::put('/lessons/{lesson}', [ManagerCourseController::class, 'updateLesson'])
+                ->whereNumber('lesson')
+                ->name('lessons.update');
+
+            Route::delete('/lessons/{lesson}', [ManagerCourseController::class, 'deleteLesson'])
+                ->whereNumber('lesson')
+                ->name('lessons.destroy');
+
+            Route::post('/lessons/{lesson}/exercises', [ManagerCourseController::class, 'storeExercise'])
+                ->whereNumber('lesson')
+                ->name('lessons.exercises.store');
+
+            Route::delete('/exercises/{exercise}', [ManagerCourseController::class, 'deleteExercise'])
+                ->whereNumber('exercise')
+                ->name('exercises.destroy');
+        });
+});
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
@@ -122,12 +180,30 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/lessons', [LessonAdminController::class, 'index'])->name('admin.lessons');
     Route::get('/lessons/create', [LessonAdminController::class, 'create'])->name('admin.lessons.create');
     Route::post('/lessons', [LessonAdminController::class, 'store'])->name('admin.lessons.store');
-    Route::get('/lessons/{lesson}/exercises', [LessonAdminController::class, 'exercises'])->name('admin.exercises');
-    Route::put('/lessons/{lesson}', [LessonAdminController::class, 'updateLesson'])->name('admin.lessons.update');
-    Route::post('/lessons/{lesson}/exercises', [LessonAdminController::class, 'storeExercise'])->name('admin.exercises.store');
-    Route::put('/exercises/{exercise}', [LessonAdminController::class, 'updateExercise'])->name('admin.exercises.update');
-    Route::delete('/exercises/{exercise}', [LessonAdminController::class, 'deleteExercise'])->name('admin.exercises.delete');
-    Route::get('/lessons/{lesson}/preview', [LessonAdminController::class, 'preview'])->name('admin.lessons.preview');
+
+    Route::get('/lessons/{lesson}/exercises', [LessonAdminController::class, 'exercises'])
+        ->whereNumber('lesson')
+        ->name('admin.exercises');
+
+    Route::put('/lessons/{lesson}', [LessonAdminController::class, 'updateLesson'])
+        ->whereNumber('lesson')
+        ->name('admin.lessons.update');
+
+    Route::post('/lessons/{lesson}/exercises', [LessonAdminController::class, 'storeExercise'])
+        ->whereNumber('lesson')
+        ->name('admin.exercises.store');
+
+    Route::put('/exercises/{exercise}', [LessonAdminController::class, 'updateExercise'])
+        ->whereNumber('exercise')
+        ->name('admin.exercises.update');
+
+    Route::delete('/exercises/{exercise}', [LessonAdminController::class, 'deleteExercise'])
+        ->whereNumber('exercise')
+        ->name('admin.exercises.delete');
+
+    Route::get('/lessons/{lesson}/preview', [LessonAdminController::class, 'preview'])
+        ->whereNumber('lesson')
+        ->name('admin.lessons.preview');
 
     Route::get('/users', [UserAdminController::class, 'index'])->name('admin.users');
     Route::post('/users/{user}/toggle-block', [UserAdminController::class, 'toggleBlock'])->name('admin.users.toggleBlock');
