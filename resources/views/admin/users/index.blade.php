@@ -4,7 +4,7 @@
 <div class="adminPageTop">
     <div>
         <h1 class="h1">Пользователи</h1>
-        <p class="muted">Администрирование учеников и просмотр учебной активности.</p>
+        <p class="muted">Администрирование учеников, администраторов и контент-менеджеров.</p>
     </div>
 
     <a class="btn btn--ghost" href="{{ route('admin.index') }}">Админ-панель</a>
@@ -32,6 +32,7 @@
             <thead>
                 <tr>
                     <th>Пользователь</th>
+                    <th>Роль</th>
                     <th>Уровень</th>
                     <th>Прогресс</th>
                     <th>Точность</th>
@@ -51,6 +52,16 @@
                             <b>{{ $user->name }}</b><br>
                             <span class="muted small">{{ $user->email }}</span>
                         </td>
+                        <td>
+                            @if($user->is_admin)
+                                <span class="badge">админ</span>
+                            @elseif($user->role === \App\Models\User::ROLE_CONTENT_MANAGER)
+                                <span class="badge">контент-менеджер</span><br>
+                                <span class="muted small">курсов: {{ $user->content_courses_count }} • подписчиков: {{ $user->followers_count }}</span>
+                            @else
+                                <span class="badge">пользователь</span>
+                            @endif
+                        </td>
                         <td>LVL {{ $user->level }}<br><span class="muted small">✨ {{ $user->xp }} • 🪙 {{ $user->coins }}</span></td>
                         <td>{{ $user->completed_lessons_count }} уроков<br><span class="muted small">{{ $user->attempts_count }} попыток</span></td>
                         <td>{{ $accuracy }}%</td>
@@ -60,9 +71,6 @@
                             @else
                                 <span class="badge badge--ok">активен</span>
                             @endif
-                            @if($user->is_admin)
-                                <span class="badge">админ</span>
-                            @endif
                         </td>
                         <td>
                             <div class="row">
@@ -70,16 +78,24 @@
                                     @csrf
                                     <button class="btn btn--ghost" type="submit">{{ $user->is_blocked ? 'Разблокировать' : 'Блокировать' }}</button>
                                 </form>
+
                                 <form method="POST" action="{{ route('admin.users.toggleAdmin', $user) }}">
                                     @csrf
                                     <button class="btn btn--ghost" type="submit">{{ $user->is_admin ? 'Снять админа' : 'Сделать админом' }}</button>
+                                </form>
+
+                                <form method="POST" action="{{ route('admin.users.toggleContentManager', $user) }}">
+                                    @csrf
+                                    <button class="btn btn--ghost" type="submit">
+                                        {{ $user->role === \App\Models\User::ROLE_CONTENT_MANAGER ? 'Снять контент-менеджера' : 'Сделать контент-менеджером' }}
+                                    </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6">Пользователи не найдены.</td>
+                        <td colspan="7">Пользователи не найдены.</td>
                     </tr>
                 @endforelse
             </tbody>

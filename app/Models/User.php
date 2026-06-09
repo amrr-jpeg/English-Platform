@@ -12,6 +12,10 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public const ROLE_USER = 'user';
+    public const ROLE_CONTENT_MANAGER = 'content_manager';
+    public const ROLE_ADMIN = 'admin';
+
     protected $fillable = [
         'name',
         'email',
@@ -32,6 +36,7 @@ class User extends Authenticatable
         'best_streak',
         'last_activity_date',
         'is_admin',
+        'role',
         'equipped_hat_id',
         'equipped_glasses_id',
         'equipped_hat',
@@ -39,8 +44,6 @@ class User extends Authenticatable
         'equipped_effect',
         'profile_background',
         'profile_frame',
-        'verification_code',
-        'is_verified',
     ];
 
     protected $hidden = [
@@ -65,6 +68,25 @@ class User extends Authenticatable
         'streak' => 'integer',
         'best_streak' => 'integer',
     ];
+
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin || $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isContentManager(): bool
+    {
+        return $this->role === self::ROLE_CONTENT_MANAGER || $this->isAdmin();
+    }
+
+    public function roleLabel(): string
+    {
+        return match ($this->role) {
+            self::ROLE_ADMIN => 'Администратор',
+            self::ROLE_CONTENT_MANAGER => 'Контент-менеджер',
+            default => 'Пользователь',
+        };
+    }
 
     public function userExercises(): HasMany
     {
@@ -94,5 +116,32 @@ class User extends Authenticatable
     public function shopItems(): HasMany
     {
         return $this->hasMany(UserShopItem::class);
+    }
+
+    public function contentCourses(): HasMany
+    {
+        return $this->hasMany(ContentCourse::class, 'creator_id');
+    }
+
+    public function contentLessons(): HasMany
+    {
+        return $this->hasMany(Lesson::class, 'creator_id');
+    }
+
+    public function contentManagerSubscriptions(): HasMany
+    {
+        return $this->hasMany(ContentManagerSubscription::class, 'user_id');
+    }
+
+    public function contentManagerFollowers(): HasMany
+    {
+        return $this->hasMany(ContentManagerSubscription::class, 'content_manager_id');
+    }
+
+    public function isSubscribedTo(User $contentManager): bool
+    {
+        return $this->contentManagerSubscriptions()
+            ->where('content_manager_id', $contentManager->id)
+            ->exists();
     }
 }

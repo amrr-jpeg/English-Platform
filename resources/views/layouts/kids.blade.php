@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'English Platform') }}</title>
 
-    <link rel="stylesheet" href="{{ asset('css/kids.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/dashboard-responsive.css') }}">
+<link rel="stylesheet" href="{{ asset('css/kids.css') }}">
+<link rel="stylesheet" href="{{ asset('css/dashboard-responsive.css') }}">
     @stack('styles')
 </head>
 
