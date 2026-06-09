@@ -90,3 +90,68 @@
         gap: 0.3rem;
     }
 }
+
+/* ========== Адаптив верхнего меню ========== */
+@media (max-width: 1024px) {
+    .modernTopbar__shell {
+        grid-template-columns: auto auto;
+    }
+
+    .navToggle {
+        display: grid !important;
+        justify-self: end !important;
+    }
+
+    .modernNav,
+    .modernUserArea {
+        grid-column: 1 / -1;
+    }
+
+    .modernNav {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0 4px;
+    }
+
+    .modernNav.is-open {
+        display: flex;
+    }
+
+    .navGroup__button,
+    .navDirectLink {
+        width: 100% !important;
+        justify-content: space-between !important;
+        background: #fff !important;
+        border-color: var(--line) !important;
+    }
+
+    .navDropdown,
+    .profileDropdown {
+        position: static !important;
+        width: 100% !important;
+        margin-top: 8px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        display: none !important;
+        transform: none !important;
+        box-shadow: var(--shadow-xs) !important;
+    }
+
+    .navGroup.is-open .navDropdown,
+    .profileMenu.is-open .profileDropdown {
+        display: grid !important;
+    }
+
+    .modernUserArea {
+        justify-content: space-between !important;
+        width: 100% !important;
+        flex-wrap: wrap !important;
+    }
+
+    .profileTrigger {
+        width: 100% !important;
+        margin-top: 0.3rem !important;
+    }
+}
