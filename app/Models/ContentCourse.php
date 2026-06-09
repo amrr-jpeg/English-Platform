@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ContentCourse extends Model
 {
     protected $fillable = [
-        'user_id',
         'creator_id',
-        'manager_id',
         'title',
+        'slug',
         'description',
+        'level',
         'is_published',
     ];
 
@@ -24,30 +24,20 @@ class ContentCourse extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id')
-            ->withDefault(function ($user) {
-                $user->name = 'Контент-менеджер';
-            });
+            ->withDefault([
+                'name' => 'Контент-менеджер',
+            ]);
     }
 
     public function manager(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'manager_id')
-            ->withDefault(function ($user) {
-                $user->name = 'Контент-менеджер';
-            });
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id')
-            ->withDefault(function ($user) {
-                $user->name = 'Контент-менеджер';
-            });
+        return $this->creator();
     }
 
     public function lessons(): HasMany
     {
-        return $this->hasMany(ContentLesson::class, 'course_id')
-            ->orderBy('order');
+        return $this->hasMany(Lesson::class, 'content_course_id')
+            ->orderBy('order')
+            ->orderBy('id');
     }
 }

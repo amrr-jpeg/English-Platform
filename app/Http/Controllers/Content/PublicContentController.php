@@ -97,13 +97,16 @@ class PublicContentController extends Controller
     }
 
     public function course(ContentCourse $course)
-    {
-        abort_unless($course->is_published || $course->creator_id === auth()->id() || auth()->user()->isAdmin(), 404);
+{
+    abort_unless(
+        $course->is_published || $course->creator_id === auth()->id() || auth()->user()->isAdmin(),
+        404
+    );
 
-        $course->load(['creator', 'lessons.exercises']);
+    $course->load(['creator', 'lessons.exercises']);
 
-        return view('content.courses.show', compact('course'));
-    }
+    return view('content.courses.show', compact('course'));
+}
 
     public function lesson(Lesson $lesson)
     {
