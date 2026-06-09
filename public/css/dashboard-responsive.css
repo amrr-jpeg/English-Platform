@@ -155,3 +155,74 @@
         margin-top: 0.3rem !important;
     }
 }
+
+/* ===== Верхнее меню адаптив для мобильных ===== */
+@media (max-width: 768px) {
+    /* Главный контейнер верхнего меню */
+    .modernTopbar__shell {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: stretch !important;
+        gap: 10px;
+        padding: 8px 12px !important;
+    }
+
+    /* Логотип */
+    .modernTopbar__logo {
+        flex: 1 1 auto;
+        max-width: 100% !important;
+        margin-bottom: 6px;
+    }
+
+    /* Контейнер навигации */
+    .modernNav {
+        display: none !important; /* скрыт до нажатия гамбургера */
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 8px;
+    }
+
+    .modernNav.is-open {
+        display: flex !important;
+    }
+
+    .navGroup__button,
+    .navDirectLink {
+        width: 100% !important;
+        justify-content: space-between !important;
+        text-align: left !important;
+        padding: 10px !important;
+    }
+
+    /* Контейнер с кнопками профиля и статистикой */
+    .modernUserArea {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px;
+        width: 100% !important;
+    }
+
+    /* Кнопка гамбургера */
+    .navToggle {
+        display: grid !important;
+        justify-content: end !important;
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    /* Профиль и dropdown */
+    .profileDropdown,
+    .navDropdown {
+        position: static !important;
+        width: 100% !important;
+        margin-top: 4px !important;
+        display: none !important;
+    }
+
+    .profileMenu.is-open .profileDropdown,
+    .navGroup.is-open .navDropdown {
+        display: grid !important;
+        gap: 6px;
+    }
+}
