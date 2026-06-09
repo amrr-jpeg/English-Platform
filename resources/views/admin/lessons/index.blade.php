@@ -52,8 +52,12 @@
             </div>
 
             <div class="adminLessonCard__actions">
-                <a class="btn" href="{{ route('admin.exercises', $lesson) }}">
-                    Редактировать
+                <a class="btn" href="{{ route('admin.lessons.edit', $lesson) }}">
+                    Редактировать урок
+                </a>
+
+                <a class="btn btn--ghost" href="{{ route('admin.exercises', $lesson) }}">
+                    Отдельно задания
                 </a>
 
                 <a class="btn btn--ghost" href="{{ route('admin.lessons.preview', $lesson) }}">

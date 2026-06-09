@@ -83,6 +83,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/lessons', [LessonAdminController::class, 'index'])->name('admin.lessons');
     Route::get('/lessons/create', [LessonAdminController::class, 'create'])->name('admin.lessons.create');
     Route::post('/lessons', [LessonAdminController::class, 'store'])->name('admin.lessons.store');
+    Route::get('/lessons/{lesson}/edit', [LessonAdminController::class, 'edit'])->name('admin.lessons.edit');
     Route::get('/lessons/{lesson}/exercises', [LessonAdminController::class, 'exercises'])->name('admin.exercises');
     Route::put('/lessons/{lesson}', [LessonAdminController::class, 'updateLesson'])->name('admin.lessons.update');
     Route::post('/lessons/{lesson}/exercises', [LessonAdminController::class, 'storeExercise'])->name('admin.exercises.store');

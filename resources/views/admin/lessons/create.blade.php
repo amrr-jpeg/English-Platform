@@ -1,7 +1,20 @@
 @extends('layouts.kids')
 
 @php
+    $mode = $mode ?? 'create';
     $isEdit = $mode === 'edit';
+
+    $lesson = $lesson ?? new \App\Models\Lesson([
+        'order' => 1,
+        'title' => '',
+        'description' => '',
+        'level' => 'A1',
+        'category' => '',
+        'theory' => '',
+        'is_active' => true,
+    ]);
+
+    $exerciseRows = $exerciseRows ?? [];
     $oldExercises = old('exercises');
     $rows = is_array($oldExercises) ? $oldExercises : $exerciseRows;
 @endphp
@@ -12,16 +25,18 @@
 <div class="adminPageTop">
     <div>
         <h1 class="h1">{{ $isEdit ? 'Редактировать урок' : 'Создать урок' }}</h1>
-        <p class="muted">Новая логика: сначала заполняется урок, ниже добавляются упражнения без ручного JSON.</p>
+        <p class="muted">Заполни урок и добавь упражнения без ручного JSON.</p>
     </div>
 </div>
 
 @if(session('success'))
     <div class="toast toast--ok">{{ session('success') }}</div>
 @endif
+
 @if(session('error'))
     <div class="toast toast--bad">{{ session('error') }}</div>
 @endif
+
 @if($errors->any())
     <div class="toast toast--bad">
         <b>Исправь ошибки:</b>
@@ -35,6 +50,7 @@
 
 <form method="POST" action="{{ $isEdit ? route('admin.lessons.update', $lesson) : route('admin.lessons.store') }}" class="lessonBuilder">
     @csrf
+
     @if($isEdit)
         @method('PUT')
     @endif
@@ -50,44 +66,79 @@
         <div class="adminFormGrid">
             <div>
                 <label class="label">Порядок урока</label>
-                <input class="input" type="number" name="order" min="1" value="{{ old('order', $lesson->order) }}" required>
+                <input
+                    class="input"
+                    type="number"
+                    name="order"
+                    min="1"
+                    value="{{ old('order', $lesson->order ?? 1) }}"
+                    required
+                >
             </div>
 
             <div>
                 <label class="label">Уровень</label>
-                <select class="input" name="level" required>
+                <select class="input" name="level">
                     @foreach(['A1','A2','B1','B2'] as $level)
-                        <option value="{{ $level }}" @selected(old('level', $lesson->level ?? 'A1') === $level)>{{ $level }}</option>
+                        <option value="{{ $level }}" @selected(old('level', $lesson->level ?? 'A1') === $level)>
+                            {{ $level }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
             <div class="adminFormGrid__wide">
                 <label class="label">Название урока</label>
-                <input class="input" name="title" value="{{ old('title', $lesson->title) }}" placeholder="Например: Animals and pets" required>
+                <input
+                    class="input"
+                    name="title"
+                    value="{{ old('title', $lesson->title ?? '') }}"
+                    placeholder="Например: Animals and pets"
+                    required
+                >
             </div>
 
             <div>
                 <label class="label">Тема / категория</label>
-                <input class="input" name="category" value="{{ old('category', $lesson->category) }}" placeholder="Vocabulary, Grammar, Speaking...">
+                <input
+                    class="input"
+                    name="category"
+                    value="{{ old('category', $lesson->category ?? '') }}"
+                    placeholder="Vocabulary, Grammar, Speaking..."
+                >
             </div>
 
             <div>
                 <label class="label">Публикация</label>
                 <label class="adminSwitch">
-                    <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $lesson->is_active ?? true))>
+                    <input
+                        type="checkbox"
+                        name="is_active"
+                        value="1"
+                        @checked(old('is_active', $lesson->is_active ?? true))
+                    >
                     <span>Урок активен</span>
                 </label>
             </div>
 
             <div class="adminFormGrid__wide">
                 <label class="label">Краткое описание</label>
-                <textarea class="input" name="description" rows="3" placeholder="Что ученик изучит в этом уроке?">{{ old('description', $lesson->description) }}</textarea>
+                <textarea
+                    class="input"
+                    name="description"
+                    rows="3"
+                    placeholder="Что ученик изучит в этом уроке?"
+                >{{ old('description', $lesson->description ?? '') }}</textarea>
             </div>
 
             <div class="adminFormGrid__wide">
                 <label class="label">Теория урока</label>
-                <textarea class="input adminTextareaLarge" name="theory" rows="7" placeholder="Объяснение темы, правила, примеры. Это увидит ученик перед упражнениями.">{{ old('theory', $lesson->theory) }}</textarea>
+                <textarea
+                    class="input adminTextareaLarge"
+                    name="theory"
+                    rows="7"
+                    placeholder="Объяснение темы, правила, примеры. Это увидит ученик перед упражнениями."
+                >{{ old('theory', $lesson->theory ?? '') }}</textarea>
             </div>
         </div>
     </section>
@@ -99,7 +150,10 @@
                 <h2 class="h2">Упражнения</h2>
                 <p class="muted small">Добавляй задания в нужном порядке. Поля меняются в зависимости от типа.</p>
             </div>
-            <button class="btn" type="button" id="addExerciseBtn">+ Добавить упражнение</button>
+
+            <button class="btn" type="button" id="addExerciseBtn">
+                + Добавить упражнение
+            </button>
         </div>
 
         <div id="exerciseBuilder" class="exerciseBuilder"></div>
@@ -108,9 +162,14 @@
     <div class="builderSaveBar card">
         <div>
             <b>{{ $isEdit ? 'Сохранить изменения?' : 'Готово к созданию?' }}</b>
-            <div class="muted small">После сохранения урок появится в списке. Если он активен, ученики увидят его на главной.</div>
+            <div class="muted small">
+                После сохранения урок появится в списке. Если он активен, ученики увидят его на главной.
+            </div>
         </div>
-        <button class="btn" type="submit">{{ $isEdit ? 'Сохранить урок' : 'Создать урок' }}</button>
+
+        <button class="btn" type="submit">
+            {{ $isEdit ? 'Сохранить урок' : 'Создать урок' }}
+        </button>
     </div>
 </form>
 
@@ -121,6 +180,7 @@
                 <div class="badge">Задание <span data-number></span></div>
                 <h3 class="exerciseEditor__title" data-title>Новое упражнение</h3>
             </div>
+
             <div class="exerciseEditor__actions">
                 <button class="btn btn--ghost" type="button" data-move-up>↑</button>
                 <button class="btn btn--ghost" type="button" data-move-down>↓</button>
@@ -137,6 +197,10 @@
                     <option value="scramble">Собрать слово</option>
                     <option value="pairs">Соединить пары</option>
                     <option value="syllables">Собрать слово из слогов</option>
+                    <option value="drag_word">Перетащить буквы</option>
+                    <option value="drag_sentence">Собрать предложение</option>
+                    <option value="flashcards">Карточки</option>
+                    <option value="listening">Аудирование</option>
                 </select>
             </div>
 
@@ -147,7 +211,11 @@
 
             <div class="adminFormGrid__wide">
                 <label class="label">Вопрос</label>
-                <input class="input" data-field="question" placeholder="Например: Choose the correct translation for cat">
+                <input
+                    class="input"
+                    data-field="question"
+                    placeholder="Например: Choose the correct translation for cat"
+                >
             </div>
 
             <div data-common-answer>
@@ -167,33 +235,95 @@
 
             <div class="adminFormGrid__wide typeBlock" data-block="choice">
                 <label class="label">Варианты ответа</label>
-                <textarea class="input" rows="4" data-field="options_text" placeholder="Каждый вариант с новой строки&#10;cat&#10;dog&#10;bird"></textarea>
+                <textarea
+                    class="input"
+                    rows="4"
+                    data-field="options_text"
+                    placeholder="Каждый вариант с новой строки&#10;cat&#10;dog&#10;bird"
+                ></textarea>
                 <div class="muted small">Правильный ответ должен совпадать с одним из вариантов.</div>
+            </div>
+
+            <div class="adminFormGrid__wide typeBlock" data-block="listening">
+                <label class="label">Варианты ответа для аудирования</label>
+                <textarea
+                    class="input"
+                    rows="4"
+                    data-field="options_text"
+                    placeholder="Можно оставить пустым или написать варианты с новой строки"
+                ></textarea>
             </div>
 
             <div class="adminFormGrid__wide typeBlock" data-block="scramble">
                 <label class="label">Буквы для перемешивания</label>
-                <input class="input" data-field="letters_text" placeholder="Можно оставить пустым: буквы возьмутся из правильного ответа">
+                <input
+                    class="input"
+                    data-field="chips_text"
+                    placeholder="Можно оставить пустым: буквы возьмутся из правильного ответа"
+                >
                 <div class="muted small">Пример: c a t или C,A,T.</div>
+            </div>
+
+            <div class="adminFormGrid__wide typeBlock" data-block="drag_word">
+                <label class="label">Буквы для перетаскивания</label>
+                <input
+                    class="input"
+                    data-field="chips_text"
+                    placeholder="Можно оставить пустым: буквы возьмутся из правильного ответа"
+                >
+            </div>
+
+            <div class="adminFormGrid__wide typeBlock" data-block="drag_sentence">
+                <label class="label">Слова для предложения</label>
+                <input
+                    class="input"
+                    data-field="chips_text"
+                    placeholder="Можно оставить пустым: слова возьмутся из правильного ответа"
+                >
             </div>
 
             <div class="adminFormGrid__wide typeBlock" data-block="pairs">
                 <label class="label">Пары</label>
-                <textarea class="input" rows="5" data-field="pairs_text" placeholder="Каждая пара с новой строки:&#10;cat=кот&#10;dog=собака&#10;bird=птица"></textarea>
+                <textarea
+                    class="input"
+                    rows="5"
+                    data-field="pairs_text"
+                    placeholder="Каждая пара с новой строки:&#10;cat=кот&#10;dog=собака&#10;bird=птица"
+                ></textarea>
                 <div class="muted small">Ученику будут показаны слова слева и перемешанные варианты перевода справа.</div>
             </div>
 
             <div class="adminFormGrid__wide typeBlock" data-block="syllables">
                 <label class="label">Слоги</label>
-                <input class="input" data-field="syllables_text" placeholder="hel lo или po ta to">
+                <input class="input" data-field="chips_text" placeholder="hel lo или po ta to">
                 <div class="muted small">Итоговое слово укажи в поле «Правильный ответ».</div>
+            </div>
+
+            <div class="adminFormGrid__wide typeBlock" data-block="flashcards">
+                <label class="label">Карточки</label>
+                <textarea
+                    class="input"
+                    rows="5"
+                    data-field="cards_text"
+                    placeholder="Каждая карточка с новой строки:&#10;cat=кот&#10;dog=собака"
+                ></textarea>
+            </div>
+
+            <div class="adminFormGrid__wide typeBlock" data-block="listening">
+                <label class="label">Текст для озвучивания</label>
+                <input
+                    class="input"
+                    data-field="listening_text"
+                    placeholder="Например: apple"
+                >
+                <div class="muted small">В поле «Правильный ответ» напиши правильный перевод или слово.</div>
             </div>
         </div>
     </article>
 </template>
 
 <script>
-const initialExercises = @json($rows, JSON_UNESCAPED_UNICODE);
+const initialExercises = @json(array_values($rows), JSON_UNESCAPED_UNICODE);
 const builder = document.getElementById('exerciseBuilder');
 const template = document.getElementById('exerciseTemplate');
 const addBtn = document.getElementById('addExerciseBtn');
@@ -204,23 +334,53 @@ function defaultExercise() {
         question: '',
         answer: '',
         options_text: '',
+        chips_text: '',
         letters_text: '',
         pairs_text: '',
         syllables_text: '',
+        cards_text: '',
+        listening_text: '',
         xp_reward: 10,
         coin_reward: 3,
-        order: builder.children.length + 1,
+        order: builder.querySelectorAll('[data-exercise-card]').length + 1,
     };
 }
 
+function removeEmptyState() {
+    const empty = builder.querySelector('.emptyState');
+    if (empty) {
+        empty.remove();
+    }
+}
+
+function showEmptyState() {
+    if (builder.querySelectorAll('[data-exercise-card]').length === 0) {
+        builder.innerHTML = `
+            <div class="emptyState card">
+                <div class="emptyState__icon">🧩</div>
+                <h2 class="h2">Упражнений пока нет</h2>
+                <p class="muted">Нажми «Добавить упражнение», чтобы создать первое задание.</p>
+            </div>
+        `;
+    }
+}
+
 function addExercise(data = {}) {
+    removeEmptyState();
+
     const row = {...defaultExercise(), ...data};
     const node = template.content.firstElementChild.cloneNode(true);
+
     builder.appendChild(node);
 
     node.querySelectorAll('[data-field]').forEach(field => {
         const key = field.dataset.field;
-        field.value = row[key] ?? '';
+
+        if (key === 'chips_text') {
+            field.value = row.chips_text || row.letters_text || row.syllables_text || '';
+        } else {
+            field.value = row[key] ?? '';
+        }
     });
 
     node.querySelector('[data-remove]').addEventListener('click', () => {
@@ -230,13 +390,21 @@ function addExercise(data = {}) {
 
     node.querySelector('[data-move-up]').addEventListener('click', () => {
         const prev = node.previousElementSibling;
-        if (prev) builder.insertBefore(node, prev);
+
+        if (prev && prev.matches('[data-exercise-card]')) {
+            builder.insertBefore(node, prev);
+        }
+
         renumber();
     });
 
     node.querySelector('[data-move-down]').addEventListener('click', () => {
         const next = node.nextElementSibling;
-        if (next) builder.insertBefore(next, node);
+
+        if (next && next.matches('[data-exercise-card]')) {
+            builder.insertBefore(next, node);
+        }
+
         renumber();
     });
 
@@ -255,30 +423,30 @@ function refreshTitle(card) {
 
 function refreshType(card) {
     const type = card.querySelector('[data-field="type"]').value;
+
     card.querySelectorAll('.typeBlock').forEach(block => {
         block.style.display = block.dataset.block === type ? '' : 'none';
     });
 
     const answer = card.querySelector('[data-common-answer]');
-    answer.style.display = type === 'pairs' ? 'none' : '';
+    answer.style.display = ['pairs', 'flashcards'].includes(type) ? 'none' : '';
 }
 
 function renumber() {
-    Array.from(builder.children).forEach((card, index) => {
+    const cards = Array.from(builder.querySelectorAll('[data-exercise-card]'));
+
+    cards.forEach((card, index) => {
         card.querySelector('[data-number]').textContent = index + 1;
+
         card.querySelectorAll('[data-field]').forEach(field => {
             const key = field.dataset.field;
             field.name = `exercises[${index}][${key}]`;
         });
+
         card.querySelector('[data-field="order"]').value = index + 1;
     });
 
-    if (builder.children.length === 0) {
-        builder.innerHTML = '<div class="emptyState card"><div class="emptyState__icon">🧩</div><h2 class="h2">Упражнений пока нет</h2><p class="muted">Нажми «Добавить упражнение», чтобы создать первое задание.</p></div>';
-    } else {
-        const empty = builder.querySelector('.emptyState');
-        if (empty) empty.remove();
-    }
+    showEmptyState();
 }
 
 addBtn.addEventListener('click', () => addExercise());
