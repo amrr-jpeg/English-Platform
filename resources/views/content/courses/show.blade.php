@@ -24,7 +24,7 @@
 
             <p class="muted">{{ $lesson->description }}</p>
 
-            <a href="{{ route('lessons.show', $lesson) }}" class="btn">
+            <a href="{{ route('content.lessons.show', $lesson) }}" class="btn">
                 Открыть урок
             </a>
         </div>
