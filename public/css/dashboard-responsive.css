@@ -1,37 +1,428 @@
-/* ======================
-   Адаптивность
-   ====================== */
-@media (max-width: 1024px) {
-    .dashboardHero {
-        grid-template-columns: 1fr;
+/* Dashboard responsive fix */
+
+.dashboardPage--adaptive {
+    width: min(100%, 1400px);
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.dashboardHero--adaptive {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.85fr) minmax(320px, 0.9fr) !important;
+    gap: 24px !important;
+    align-items: stretch !important;
+    margin-bottom: 34px !important;
+}
+
+.dashboardHero__main {
+    min-height: 520px !important;
+    height: 100% !important;
+    padding: 42px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.dashboardHero__title {
+    font-size: clamp(46px, 5.2vw, 78px) !important;
+    line-height: 0.98 !important;
+    margin: 14px 0 22px !important;
+    word-break: normal !important;
+}
+
+.dashboardHero__text {
+    max-width: 760px !important;
+    font-size: clamp(16px, 1.2vw, 20px) !important;
+    line-height: 1.55 !important;
+}
+
+.dashboardStats {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    margin-top: 26px !important;
+}
+
+.dashboardStat {
+    min-height: 104px !important;
+    padding: 18px !important;
+}
+
+.dashboardHero__side {
+    min-height: 520px !important;
+    display: grid !important;
+    grid-template-rows: repeat(3, 1fr) !important;
+    gap: 16px !important;
+}
+
+.dashboardMiniCard {
+    min-height: 0 !important;
+    padding: 22px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.dashboardMiniCard--hero {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 18px !important;
+}
+
+.lessonChestMiniCard {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(255, 221, 87, 0.35), transparent 34%),
+        linear-gradient(135deg, #fff8db 0%, #ffffff 55%, #eef7ff 100%) !important;
+    border: 2px solid rgba(250, 204, 21, 0.55) !important;
+}
+
+.lessonChestMiniCard__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.lessonChestMiniCard__body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.lessonChestMiniCard__icon {
+    width: 56px;
+    height: 56px;
+    flex: 0 0 auto;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 32px;
+    background: linear-gradient(135deg, #ffe08a, #ffb703);
+    box-shadow: 0 12px 26px rgba(255, 183, 3, 0.3);
+    animation: chestFloat 2.2s ease-in-out infinite;
+}
+
+.lessonChestMiniCard__icon--ready {
+    animation: chestReady 0.9s ease-in-out infinite;
+}
+
+.lessonChestMiniCard__progress {
+    height: 13px;
+    margin-top: 14px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.95);
+    overflow: hidden;
+    box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.14);
+}
+
+.lessonChestMiniCard__bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #22c55e, #84cc16, #facc15);
+    transition: width 0.8s ease;
+}
+
+.lessonChestMiniCard__button {
+    width: 100%;
+    margin-top: 14px;
+    border: 0;
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-weight: 900;
+    color: #ffffff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #f97316, #facc15);
+    box-shadow: 0 12px 24px rgba(249, 115, 22, 0.28);
+}
+
+.lessonChestMiniCard__button--disabled {
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #94a3b8, #cbd5e1);
+    box-shadow: none;
+}
+
+.dashboardLessons {
+    margin-top: 30px !important;
+}
+
+.dashboardSectionHead {
+    margin-bottom: 18px !important;
+}
+
+.dashboardLessonGrid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+}
+
+.dashboardLessonCard {
+    min-height: 230px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.dashboardLessonCard__progress {
+    margin-top: auto !important;
+}
+
+.dashboardLessonCard__bottom {
+    margin-top: 16px !important;
+}
+
+.dashboardMoreWrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+#showMoreLessonsBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 220px;
+    padding: 14px 24px;
+    border-radius: 18px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+/* Modal reward */
+.chestRewardOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    transition: opacity 0.3s ease;
+}
+
+.chestRewardModal {
+    position: relative;
+    overflow: hidden;
+    width: min(440px, 100%);
+    padding: 34px;
+    text-align: center;
+    background: linear-gradient(135deg, #ffffff, #fff7d6);
+    border: 2px solid rgba(250, 204, 21, 0.65);
+}
+
+.chestRewardModal__shine {
+    position: absolute;
+    inset: -50%;
+    background: conic-gradient(
+        from 0deg,
+        transparent,
+        rgba(250, 204, 21, 0.25),
+        transparent,
+        rgba(59, 130, 246, 0.18),
+        transparent
+    );
+    animation: rewardSpin 4s linear infinite;
+}
+
+.chestRewardModal > *:not(.chestRewardModal__shine) {
+    position: relative;
+    z-index: 1;
+}
+
+.chestRewardModal__chest {
+    font-size: 86px;
+    margin-bottom: 10px;
+    animation: chestOpen 0.9s ease-in-out infinite alternate;
+}
+
+.chestRewardModal__rewards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 18px 0 24px;
+}
+
+.chestRewardModal__rewards span {
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: #ffffff;
+    font-weight: 900;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+    .dashboardPage--adaptive {
+        padding: 20px;
     }
+
+    .dashboardHero--adaptive {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboardHero__main {
+        min-height: auto !important;
+        padding: 34px !important;
+    }
+
     .dashboardHero__side {
-        grid-template-rows: repeat(3, auto);
+        min-height: auto !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        grid-template-rows: auto !important;
     }
-    .cards-row .dashboardLessonCard {
-        flex: 1 1 calc(50% - 16px);
+
+    .dashboardLessonGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 }
 
-@media (max-width: 600px) {
+/* Phone */
+@media (max-width: 700px) {
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .dashboardPage--adaptive {
+        padding: 14px;
+    }
+
+    .dashboardHero--adaptive {
+        gap: 16px !important;
+        margin-bottom: 22px !important;
+    }
+
     .dashboardHero__main {
-        gap: 12px;
+        padding: 24px 20px !important;
+        border-radius: 28px !important;
     }
+
     .dashboardHero__title {
-        font-size: 28px;
+        font-size: clamp(40px, 13vw, 56px) !important;
+        line-height: 0.98 !important;
     }
+
+    .dashboardHero__text {
+        font-size: 16px !important;
+    }
+
     .dashboardStats {
-        flex-direction: column;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
     }
-    .cards-row .dashboardLessonCard {
-        flex: 1 1 100%;
+
+    .dashboardStat {
+        min-height: 92px !important;
+        padding: 14px !important;
     }
-    .dashboardMiniCard--hero {
-        flex-direction: column;
-        align-items: flex-start;
+
+    .dashboardStat__value {
+        font-size: 30px !important;
     }
+
+    .dashboardHero__side {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .dashboardMiniCard {
+        padding: 18px !important;
+        border-radius: 24px !important;
+    }
+
+    .dashboardMiniCard--hero,
     .lessonChestMiniCard__body {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+
+    .lessonChestMiniCard__icon {
+        width: 52px;
+        height: 52px;
+        font-size: 30px;
+    }
+
+    .dashboardLessonGrid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .dashboardLessonCard {
+        min-height: 215px !important;
+    }
+
+    .dashboardSectionHead {
+        display: block !important;
+    }
+
+    .dashboardSectionHead__title {
+        font-size: 34px !important;
+    }
+
+    #showMoreLessonsBtn {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* Small phones */
+@media (max-width: 420px) {
+    .dashboardHero__title {
+        font-size: 38px !important;
+    }
+
+    .dashboardStats {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboardMiniCard--hero,
+    .lessonChestMiniCard__body {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+}
+
+@keyframes chestFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes chestReady {
+    0%, 100% {
+        transform: rotate(-3deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(3deg) scale(1.08);
+    }
+}
+
+@keyframes rewardSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes chestOpen {
+    from {
+        transform: scale(1) rotate(-4deg);
+    }
+
+    to {
+        transform: scale(1.12) rotate(4deg);
     }
 }
