@@ -32,13 +32,6 @@
         </button>
 
         <nav class="modernNav" id="primaryNav" aria-label="Главная навигация">
-            {{-- КУРСЫ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ --}}
-@if(auth()->check())
-    <a href="{{ route('content.courses.index') }}"
-       class="navDirectLink {{ request()->routeIs('content.courses.*') ? 'active' : '' }}">
-        📚 Курсы
-    </a>
-@endif
 
 {{-- МОИ КУРСЫ ДЛЯ КОНТЕНТ-МЕНЕДЖЕРОВ --}}
 @if(auth()->check() && auth()->user()->isContentManager())
@@ -52,6 +45,14 @@
                     <span>📚 Учёба</span>
                     <span class="navGroup__chevron">⌄</span>
                 </button>
+
+ {{-- КУРСЫ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ --}}
+@if(auth()->check())
+    <a href="{{ route('content.courses.index') }}"
+       class="navDirectLink {{ request()->routeIs('content.courses.*') ? 'active' : '' }}">
+        📚 Курсы
+    </a>
+@endif
 
                 <div class="navDropdown">
                     @if(Route::has('dashboard'))
