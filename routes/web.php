@@ -22,6 +22,7 @@ use App\Http\Controllers\Content\ManagerCourseController;
 use App\Http\Controllers\Content\PublicContentController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -80,28 +81,34 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     // Контент-менеджеры и пользовательские курсы
-    Route::get('/content-managers', [PublicContentController::class, 'managers'])->name('content.managers.index');
-    Route::get('/content-managers/{manager}', [PublicContentController::class, 'manager'])->name('content.managers.show');
-    Route::post('/content-managers/{manager}/subscribe', [PublicContentController::class, 'subscribe'])->name('content.managers.subscribe');
-    Route::delete('/content-managers/{manager}/unsubscribe', [PublicContentController::class, 'unsubscribe'])->name('content.managers.unsubscribe');
-    Route::get('/my-subscriptions/courses', [PublicContentController::class, 'subscriptions'])->name('content.subscriptions');
-    Route::get('/community/courses/{course}', [PublicContentController::class, 'course'])->name('content.courses.show');
-    Route::get('/community/lessons/{lesson}', [PublicContentController::class, 'lesson'])->name('content.lessons.show');
+Route::get('/content-managers', [PublicContentController::class, 'managers'])->name('content.managers.index');
+Route::get('/content-managers/{manager}', [PublicContentController::class, 'manager'])->name('content.managers.show');
+Route::post('/content-managers/{manager}/subscribe', [PublicContentController::class, 'subscribe'])->name('content.managers.subscribe');
+Route::delete('/content-managers/{manager}/unsubscribe', [PublicContentController::class, 'unsubscribe'])->name('content.managers.unsubscribe');
 
-    Route::middleware(['content_manager'])->prefix('manager')->name('manager.')->group(function () {
-        Route::get('/courses', [ManagerCourseController::class, 'index'])->name('courses.index');
-        Route::get('/courses/create', [ManagerCourseController::class, 'create'])->name('courses.create');
-        Route::post('/courses', [ManagerCourseController::class, 'store'])->name('courses.store');
-        Route::get('/courses/{course}/edit', [ManagerCourseController::class, 'edit'])->name('courses.edit');
-        Route::put('/courses/{course}', [ManagerCourseController::class, 'update'])->name('courses.update');
-        Route::delete('/courses/{course}', [ManagerCourseController::class, 'destroy'])->name('courses.destroy');
-        Route::post('/courses/{course}/lessons', [ManagerCourseController::class, 'storeLesson'])->name('courses.lessons.store');
-        Route::put('/lessons/{lesson}', [ManagerCourseController::class, 'updateLesson'])->name('lessons.update');
-        Route::delete('/lessons/{lesson}', [ManagerCourseController::class, 'deleteLesson'])->name('lessons.destroy');
-        Route::post('/lessons/{lesson}/exercises', [ManagerCourseController::class, 'storeExercise'])->name('lessons.exercises.store');
-        Route::delete('/exercises/{exercise}', [ManagerCourseController::class, 'deleteExercise'])->name('exercises.destroy');
-    });
+Route::get('/my-subscriptions/courses', [PublicContentController::class, 'subscriptions'])->name('content.subscriptions');
+Route::get('/community/courses/{course}', [PublicContentController::class, 'course'])->name('content.courses.show');
+Route::get('/community/lessons/{lesson}', [PublicContentController::class, 'lesson'])->name('content.lessons.show');
+
+Route::middleware(['content_manager'])->prefix('manager')->name('manager.')->group(function () {
+    Route::get('/courses', [ManagerCourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create', [ManagerCourseController::class, 'create'])->name('courses.create');
+    Route::post('/courses', [ManagerCourseController::class, 'store'])->name('courses.store');
+
+    Route::get('/courses/{course}/edit', [ManagerCourseController::class, 'edit'])->name('courses.edit');
+    Route::put('/courses/{course}', [ManagerCourseController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{course}', [ManagerCourseController::class, 'destroy'])->name('courses.destroy');
+
+    Route::post('/courses/{course}/lessons', [ManagerCourseController::class, 'storeLesson'])->name('courses.lessons.store');
+    Route::put('/lessons/{lesson}', [ManagerCourseController::class, 'updateLesson'])->name('lessons.update');
+    Route::delete('/lessons/{lesson}', [ManagerCourseController::class, 'deleteLesson'])->name('lessons.destroy');
+
+    Route::post('/lessons/{lesson}/exercises', [ManagerCourseController::class, 'storeExercise'])->name('lessons.exercises.store');
+    Route::delete('/exercises/{exercise}', [ManagerCourseController::class, 'deleteExercise'])->name('exercises.destroy');
 });
+});
+
+
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');

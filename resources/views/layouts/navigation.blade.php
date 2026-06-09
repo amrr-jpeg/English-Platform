@@ -151,9 +151,19 @@
             </div>
 
             @auth
+    @if(auth()->user()->role === 'content_manager' || (auth()->user()->is_admin ?? false))
+        @if(Route::has('manager.courses.index'))
+            <a href="{{ route('manager.courses.index') }}" class="navDirectLink mainMenu__link {{ str_starts_with($route ?? '', 'manager') ? 'active' : '' }}">
+                🧩 Мои курсы
+            </a>
+        @endif
+    @endif
+@endauth
+
+            @auth
                 @if((auth()->user()->is_admin ?? false) && Route::has('admin.index'))
                     <a href="{{ route('admin.index') }}" class="navDirectLink mainMenu__link {{ str_starts_with($route ?? '', 'admin') ? 'active' : '' }}">
-                        ⚙️ Админка
+                        ⚙️ Админ
                     </a>
                 @endif
             @endauth
