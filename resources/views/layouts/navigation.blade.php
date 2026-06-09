@@ -32,6 +32,21 @@
         </button>
 
         <nav class="modernNav" id="primaryNav" aria-label="Главная навигация">
+            {{-- КУРСЫ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ --}}
+@if(auth()->check())
+    <a href="{{ route('content.courses.index') }}"
+       class="navDirectLink {{ request()->routeIs('content.courses.*') ? 'active' : '' }}">
+        📚 Курсы
+    </a>
+@endif
+
+{{-- МОИ КУРСЫ ДЛЯ КОНТЕНТ-МЕНЕДЖЕРОВ --}}
+@if(auth()->check() && auth()->user()->isContentManager())
+    <a href="{{ route('manager.courses.index') }}"
+       class="navDirectLink {{ request()->routeIs('manager.*') ? 'active' : '' }}">
+        🧩 Мои курсы
+    </a>
+@endif
             <div class="navGroup {{ $isActive(['dashboard', 'lessons', 'exam', 'mistakes', 'travel']) ? 'is-current' : '' }}" data-nav-group>
                 <button class="navGroup__button {{ $isActive(['dashboard', 'lessons', 'exam', 'mistakes', 'travel']) ? 'active' : '' }}" type="button" data-nav-group-button aria-expanded="false">
                     <span>📚 Учёба</span>
@@ -150,25 +165,7 @@
                 </div>
             </div>
 
-            @auth
-    @if(Route::has('content.courses.index'))
-        <a href="{{ route('content.courses.index') }}"
-           class="navDirectLink {{ request()->routeIs('content.courses.*') ? 'active' : '' }}">
-            📚 Курсы
-        </a>
-    @endif
-@endauth
-
-@auth
-    @if(auth()->user()->role === 'content_manager' || (auth()->user()->is_admin ?? false))
-        @if(Route::has('manager.courses.index'))
-            <a href="{{ route('manager.courses.index') }}"
-               class="navDirectLink {{ request()->routeIs('manager.*') ? 'active' : '' }}">
-                🧩 Мои курсы
-            </a>
-        @endif
-    @endif
-@endauth
+          
 
             @auth
                 @if((auth()->user()->is_admin ?? false) && Route::has('admin.index'))
