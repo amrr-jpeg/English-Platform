@@ -6,91 +6,96 @@ use App\Http\Controllers\Controller;
 use App\Models\Exercise;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class LessonAdminController extends Controller
 {
     public function index()
     {
-        $lessons = Lesson::withCount('exercises')->orderBy('order')->get();
+        $lessons = Lesson::withCount('exercises')
+            ->orderBy('order')
+            ->orderBy('id')
+            ->get();
 
         return view('admin.lessons.index', compact('lessons'));
     }
 
     public function create()
     {
-        $mode = 'create';
-
-        $lesson = new Lesson([
-            'order' => ((int) Lesson::max('order')) + 1,
-            'title' => '',
-            'description' => '',
-            'level' => 'A1',
-            'category' => '',
-            'theory' => '',
-            'is_active' => true,
+        return view('admin.lessons.create', [
+            'lesson' => null,
+            'mode' => 'create',
+            'exerciseRows' => [],
         ]);
-
-        $exerciseRows = [];
-
-        return view('admin.lessons.create', compact('mode', 'lesson', 'exerciseRows'));
     }
 
     public function edit(Lesson $lesson)
     {
-        $mode = 'edit';
+        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')->orderBy('id')]);
 
-        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')]);
-
-        $exerciseRows = $lesson->exercises
-            ->map(fn (Exercise $exercise) => $this->exerciseToFormRow($exercise))
-            ->values()
-            ->all();
-
-        return view('admin.lessons.create', compact('mode', 'lesson', 'exerciseRows'));
+        return view('admin.lessons.create', [
+            'lesson' => $lesson,
+            'mode' => 'edit',
+            'exerciseRows' => $lesson->exercises,
+        ]);
     }
 
     public function store(Request $request)
     {
-        $validated = $this->validateLessonRequest($request);
+        $data = $request->validate([
+            'order' => ['required', 'integer', 'min:1'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'category' => ['nullable', 'string', 'max:255'],
+            'level' => ['nullable', 'string', 'max:255'],
+            'theory' => ['nullable', 'string'],
+            'is_active' => ['nullable'],
+        ]);
 
-        DB::transaction(function () use ($request, $validated) {
-            $lesson = new Lesson();
-            $this->fillLesson($lesson, $validated, $request);
-            $lesson->save();
-
-            $this->syncExercisesFromBuilder($request, $lesson);
-        });
+        $lesson = Lesson::create([
+            'order' => $data['order'],
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'category' => $data['category'] ?? null,
+            'level' => $data['level'] ?? 'easy',
+            'theory' => $data['theory'] ?? null,
+            'is_active' => $request->boolean('is_active', true),
+        ]);
 
         return redirect()
-            ->route('admin.lessons')
+            ->route('admin.lessons.edit', $lesson)
             ->with('success', 'Урок создан ✅');
-    }
-
-    public function exercises(Lesson $lesson)
-    {
-        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')]);
-
-        return view('admin.exercises.index', compact('lesson'));
     }
 
     public function updateLesson(Request $request, Lesson $lesson)
     {
-        $validated = $this->validateLessonRequest($request);
+        $data = $request->validate([
+            'order' => ['required', 'integer', 'min:1'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'category' => ['nullable', 'string', 'max:255'],
+            'level' => ['nullable', 'string', 'max:255'],
+            'theory' => ['nullable', 'string'],
+            'is_active' => ['nullable'],
+        ]);
 
-        DB::transaction(function () use ($request, $lesson, $validated) {
-            $this->fillLesson($lesson, $validated, $request);
-            $lesson->save();
+        $lesson->update([
+            'order' => $data['order'],
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'category' => $data['category'] ?? null,
+            'level' => $data['level'] ?? 'easy',
+            'theory' => $data['theory'] ?? null,
+            'is_active' => $request->boolean('is_active', true),
+        ]);
 
-            if ($request->has('exercises')) {
-                $this->syncExercisesFromBuilder($request, $lesson);
-            }
-        });
+        return back()->with('success', 'Урок обновлён ✅');
+    }
 
-        return redirect()
-            ->route('admin.lessons')
-            ->with('success', 'Урок обновлён ✅');
+    public function exercises(Lesson $lesson)
+    {
+        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')->orderBy('id')]);
+
+        return view('admin.exercises.index', compact('lesson'));
     }
 
     public function storeExercise(Request $request, Lesson $lesson)
@@ -130,73 +135,9 @@ class LessonAdminController extends Controller
 
     public function preview(Lesson $lesson)
     {
-        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')]);
+        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')->orderBy('id')]);
 
         return view('admin.lessons.preview', compact('lesson'));
-    }
-
-    private function validateLessonRequest(Request $request): array
-    {
-        return $request->validate([
-            'order' => ['required', 'integer', 'min:1'],
-            'title' => ['required', 'string', 'max:255'],
-            'level' => ['nullable', 'string', 'max:50'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'theory' => ['nullable', 'string'],
-            'is_active' => ['nullable', 'boolean'],
-            'exercises' => ['nullable', 'array'],
-        ]);
-    }
-
-    private function fillLesson(Lesson $lesson, array $data, Request $request): void
-    {
-        $values = [
-            'order' => $data['order'],
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'is_active' => $request->boolean('is_active'),
-        ];
-
-        foreach (['level', 'category', 'theory'] as $optionalColumn) {
-            if (Schema::hasColumn('lessons', $optionalColumn)) {
-                $values[$optionalColumn] = $data[$optionalColumn] ?? null;
-            }
-        }
-
-        $lesson->forceFill($values);
-    }
-
-    private function syncExercisesFromBuilder(Request $request, Lesson $lesson): void
-    {
-        $rows = $request->input('exercises', []);
-
-        if (!is_array($rows)) {
-            $rows = [];
-        }
-
-        $lesson->exercises()->delete();
-
-        foreach (array_values($rows) as $index => $row) {
-            if (!is_array($row)) {
-                continue;
-            }
-
-            $row['order'] = $index + 1;
-
-            $fakeRequest = new Request($row);
-            $prepared = $this->prepareExerciseData($fakeRequest);
-
-            if ($prepared['error']) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'exercises' => 'Задание ' . ($index + 1) . ': ' . $prepared['error'],
-                ]);
-            }
-
-            Exercise::create(array_merge($prepared['data'], [
-                'lesson_id' => $lesson->id,
-            ]));
-        }
     }
 
     private function prepareExerciseData(Request $request): array
@@ -211,8 +152,6 @@ class LessonAdminController extends Controller
             'answer' => ['nullable', 'string', 'max:1000'],
             'options_text' => ['nullable', 'string'],
             'chips_text' => ['nullable', 'string'],
-            'letters_text' => ['nullable', 'string'],
-            'syllables_text' => ['nullable', 'string'],
             'pairs_text' => ['nullable', 'string'],
             'cards_text' => ['nullable', 'string'],
             'listening_text' => ['nullable', 'string', 'max:1000'],
@@ -223,11 +162,6 @@ class LessonAdminController extends Controller
 
         $options = null;
         $extraData = null;
-
-        $chipsText = $data['chips_text']
-            ?? $data['letters_text']
-            ?? $data['syllables_text']
-            ?? '';
 
         if ($type === 'choice') {
             $options = $this->lines($data['options_text'] ?? '');
@@ -241,10 +175,8 @@ class LessonAdminController extends Controller
             }
         }
 
-        if ($type === 'input') {
-            if ($answer === '') {
-                return ['error' => 'Для ввода нужно указать правильный ответ.', 'data' => []];
-            }
+        if ($type === 'input' && $answer === '') {
+            return ['error' => 'Для ввода нужно указать правильный ответ.', 'data' => []];
         }
 
         if ($type === 'scramble') {
@@ -252,15 +184,13 @@ class LessonAdminController extends Controller
                 return ['error' => 'Для scramble нужно указать правильный ответ.', 'data' => []];
             }
 
-            $letters = $this->chips($chipsText);
+            $letters = $this->chips($data['chips_text'] ?? '');
 
             if (count($letters) === 0) {
                 $letters = $this->splitLetters($answer);
             }
 
-            $extraData = [
-                'letters' => $letters,
-            ];
+            $extraData = ['letters' => $letters];
         }
 
         if ($type === 'drag_word') {
@@ -268,7 +198,7 @@ class LessonAdminController extends Controller
                 return ['error' => 'Для drag_word нужно указать правильное слово.', 'data' => []];
             }
 
-            $letters = $this->chips($chipsText);
+            $letters = $this->chips($data['chips_text'] ?? '');
 
             if (count($letters) === 0) {
                 $letters = $this->splitLetters($answer);
@@ -285,7 +215,7 @@ class LessonAdminController extends Controller
                 return ['error' => 'Для drag_sentence нужно указать правильное предложение.', 'data' => []];
             }
 
-            $words = $this->chips($chipsText);
+            $words = $this->chips($data['chips_text'] ?? '');
 
             if (count($words) === 0) {
                 $words = preg_split('/\s+/u', trim($answer));
@@ -303,7 +233,7 @@ class LessonAdminController extends Controller
                 return ['error' => 'Для syllables нужно указать правильное слово.', 'data' => []];
             }
 
-            $syllables = $this->chips($chipsText);
+            $syllables = $this->chips($data['chips_text'] ?? '');
 
             if (count($syllables) === 0) {
                 return ['error' => 'Для syllables нужно указать слоги через пробел или запятую.', 'data' => []];
@@ -333,10 +263,7 @@ class LessonAdminController extends Controller
                 return ['error' => 'Для flashcards нужно указать карточки в формате Cat=Кот.', 'data' => []];
             }
 
-            $extraData = [
-                'cards' => $cards,
-            ];
-
+            $extraData = ['cards' => $cards];
             $answer = 'done';
         }
 
@@ -378,27 +305,12 @@ class LessonAdminController extends Controller
         ];
     }
 
-    private function exerciseToFormRow(Exercise $exercise): array
-    {
-        return [
-            'type' => $exercise->type,
-            'question' => $exercise->question,
-            'answer' => $exercise->answer,
-            'options_text' => self::exerciseToFormText($exercise, 'options'),
-            'chips_text' => self::exerciseToFormText($exercise, 'chips'),
-            'letters_text' => self::exerciseToFormText($exercise, 'chips'),
-            'syllables_text' => self::exerciseToFormText($exercise, 'chips'),
-            'pairs_text' => self::exerciseToFormText($exercise, 'pairs'),
-            'cards_text' => self::exerciseToFormText($exercise, 'cards'),
-            'listening_text' => self::exerciseToFormText($exercise, 'listening_text'),
-            'xp_reward' => $exercise->xp_reward,
-            'coin_reward' => $exercise->coin_reward,
-            'order' => $exercise->order,
-        ];
-    }
-
     private function lines(string $value): array
     {
+        if (trim($value) === '') {
+            return [];
+        }
+
         $lines = preg_split("/\r\n|\n|\r/u", trim($value));
 
         return array_values(array_filter(array_map('trim', $lines)));
@@ -406,6 +318,10 @@ class LessonAdminController extends Controller
 
     private function chips(string $value): array
     {
+        if (trim($value) === '') {
+            return [];
+        }
+
         $items = preg_split('/[\s,;]+/u', trim($value));
 
         return array_values(array_filter(array_map('trim', $items)));
@@ -437,10 +353,7 @@ class LessonAdminController extends Controller
                 continue;
             }
 
-            $pairs[] = [
-                'left' => $left,
-            ];
-
+            $pairs[] = ['left' => $left];
             $rightOptions[] = $right;
             $truePairs[$left] = $right;
         }
@@ -487,7 +400,7 @@ class LessonAdminController extends Controller
         }
 
         if ($field === 'chips') {
-            if ($exercise->type === 'drag_word') {
+            if (in_array($exercise->type, ['drag_word', 'scramble'], true)) {
                 return implode(' ', $exercise->data['letters'] ?? []);
             }
 
@@ -497,10 +410,6 @@ class LessonAdminController extends Controller
 
             if ($exercise->type === 'syllables') {
                 return implode(' ', $exercise->data['syllables'] ?? []);
-            }
-
-            if ($exercise->type === 'scramble') {
-                return implode(' ', $exercise->data['letters'] ?? []);
             }
         }
 
