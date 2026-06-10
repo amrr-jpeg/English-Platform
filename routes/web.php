@@ -175,35 +175,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
 
     Route::get('/lessons', [LessonAdminController::class, 'index'])->name('admin.lessons');
+
     Route::get('/lessons/create', [LessonAdminController::class, 'create'])->name('admin.lessons.create');
+
+    Route::get('/lessons/{lesson}/edit', [LessonAdminController::class, 'edit'])
+    ->whereNumber('lesson')
+    ->name('admin.lessons.edit');
+
     Route::post('/lessons', [LessonAdminController::class, 'store'])->name('admin.lessons.store');
 
-    Route::get('/lessons/{lesson}/exercises', [LessonAdminController::class, 'exercises'])
-        ->whereNumber('lesson')
-        ->name('admin.exercises');
 
-    Route::put('/lessons/{lesson}', [LessonAdminController::class, 'updateLesson'])
-        ->whereNumber('lesson')
-        ->name('admin.lessons.update');
+    Route::get('/lessons/{lesson}/exercises', [LessonAdminController::class, 'exercises'])->name('admin.exercises');
 
-    Route::post('/lessons/{lesson}/exercises', [LessonAdminController::class, 'storeExercise'])
-        ->whereNumber('lesson')
-        ->name('admin.exercises.store');
+    Route::put('/lessons/{lesson}', [LessonAdminController::class, 'updateLesson'])->name('admin.lessons.update');
 
-    Route::put('/exercises/{exercise}', [LessonAdminController::class, 'updateExercise'])
-        ->whereNumber('exercise')
-        ->name('admin.exercises.update');
+    Route::post('/lessons/{lesson}/exercises', [LessonAdminController::class, 'storeExercise'])->name('admin.exercises.store');
 
-    Route::delete('/exercises/{exercise}', [LessonAdminController::class, 'deleteExercise'])
-        ->whereNumber('exercise')
-        ->name('admin.exercises.delete');
+    Route::put('/exercises/{exercise}', [LessonAdminController::class, 'updateExercise'])->name('admin.exercises.update');
 
-    Route::get('/lessons/{lesson}/preview', [LessonAdminController::class, 'preview'])
-        ->whereNumber('lesson')
-        ->name('admin.lessons.preview');
+    Route::delete('/exercises/{exercise}', [LessonAdminController::class, 'deleteExercise'])->name('admin.exercises.delete');
+
+    Route::get('/lessons/{lesson}/preview', [LessonAdminController::class, 'preview'])->name('admin.lessons.preview');
+
 
     Route::get('/users', [UserAdminController::class, 'index'])->name('admin.users');
     Route::post('/users/{user}/toggle-block', [UserAdminController::class, 'toggleBlock'])->name('admin.users.toggleBlock');
