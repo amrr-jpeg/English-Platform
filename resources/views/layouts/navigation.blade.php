@@ -32,27 +32,11 @@
         </button>
 
         <nav class="modernNav" id="primaryNav" aria-label="Главная навигация">
-
-{{-- МОИ КУРСЫ ДЛЯ КОНТЕНТ-МЕНЕДЖЕРОВ --}}
-@if(auth()->check() && auth()->user()->isContentManager())
-    <a href="{{ route('manager.courses.index') }}"
-       class="navDirectLink {{ request()->routeIs('manager.*') ? 'active' : '' }}">
-        🧩 Мои курсы
-    </a>
-@endif
             <div class="navGroup {{ $isActive(['dashboard', 'lessons', 'exam', 'mistakes', 'travel']) ? 'is-current' : '' }}" data-nav-group>
                 <button class="navGroup__button {{ $isActive(['dashboard', 'lessons', 'exam', 'mistakes', 'travel']) ? 'active' : '' }}" type="button" data-nav-group-button aria-expanded="false">
                     <span>📚 Учёба</span>
                     <span class="navGroup__chevron">⌄</span>
                 </button>
-
- {{-- КУРСЫ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ --}}
-@if(auth()->check())
-    <a href="{{ route('content.courses.index') }}"
-       class="navDirectLink {{ request()->routeIs('content.courses.*') ? 'active' : '' }}">
-        📚 Курсы
-    </a>
-@endif
 
                 <div class="navDropdown">
                     @if(Route::has('dashboard'))
@@ -96,6 +80,24 @@
                     @endif
                 </div>
             </div>
+
+            @auth
+                @if(Route::has('content.courses.index'))
+                    <a href="{{ route('content.courses.index') }}"
+                       class="navDirectLink mainMenu__link {{ request()->routeIs('content.courses.*') ? 'active' : '' }}">
+                        📚 Курсы
+                    </a>
+                @endif
+            @endauth
+
+            @auth
+                @if(auth()->user()->isContentManager() && Route::has('manager.courses.index'))
+                    <a href="{{ route('manager.courses.index') }}"
+                       class="navDirectLink mainMenu__link {{ request()->routeIs('manager.*') ? 'active' : '' }}">
+                        🧩 Мои курсы
+                    </a>
+                @endif
+            @endauth
 
             <div class="navGroup {{ $isActive(['games', 'chests', 'shop']) ? 'is-current' : '' }}" data-nav-group>
                 <button class="navGroup__button {{ $isActive(['games', 'chests', 'shop']) ? 'active' : '' }}" type="button" data-nav-group-button aria-expanded="false">
@@ -162,11 +164,8 @@
                             </span>
                         </a>
                     @endif
-
                 </div>
             </div>
-
-          
 
             @auth
                 @if((auth()->user()->is_admin ?? false) && Route::has('admin.index'))
