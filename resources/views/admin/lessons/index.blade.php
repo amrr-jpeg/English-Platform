@@ -56,6 +56,17 @@
                     Редактировать урок
                 </a>
 
+                <form method="POST"
+      action="{{ route('admin.lessons.destroy', $lesson) }}"
+      onsubmit="return confirm('Точно удалить этот урок? Все упражнения внутри него тоже удалятся.');">
+    @csrf
+    @method('DELETE')
+
+    <button type="submit" class="btn btn--danger">
+        Удалить
+    </button>
+</form>
+
                 <a class="btn btn--ghost" href="{{ route('admin.exercises', $lesson) }}">
                     Отдельно задания
                 </a>

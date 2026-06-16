@@ -41,6 +41,16 @@ class LessonAdminController extends Controller
     ]);
 }
 
+public function destroy(Lesson $lesson)
+{
+    $lesson->exercises()->delete();
+    $lesson->delete();
+
+    return redirect()
+        ->route('admin.lessons')
+        ->with('success', 'Урок удалён 🗑️');
+}
+
     public function store(Request $request)
     {
         $data = $request->validate([
