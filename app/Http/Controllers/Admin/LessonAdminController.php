@@ -28,16 +28,18 @@ class LessonAdminController extends Controller
         ]);
     }
 
-    public function edit(Lesson $lesson)
-    {
-        $lesson->load(['exercises' => fn ($q) => $q->orderBy('order')->orderBy('id')]);
+   public function edit(Lesson $lesson)
+{
+    $lesson->load([
+        'exercises' => fn ($q) => $q->orderBy('order')->orderBy('id')
+    ]);
 
-        return view('admin.lessons.create', [
-            'lesson' => $lesson,
-            'mode' => 'edit',
-            'exerciseRows' => $lesson->exercises,
-        ]);
-    }
+    return view('admin.lessons.create', [
+        'lesson' => $lesson,
+        'mode' => 'edit',
+        'exerciseRows' => $lesson->exercises->values()->toArray(),
+    ]);
+}
 
     public function store(Request $request)
     {
